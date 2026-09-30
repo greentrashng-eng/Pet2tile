@@ -21,13 +21,22 @@ export async function POST(req: Request) {
 
     if (priceError || !price) {
       return NextResponse.json(
-        { error: 'No active price found for this material' },
+        { error: 'No active price' },
         { status: 400 }
       )
     }
 
     const weight = Number(body.weight_kg)
-    const payout = weight * Number(price.buy_price)
+
+    if (!weight || weight <= 0) {
+      return NextResponse.json(
+        { error: 'Invalid weight' },
+        { status: 400 }
+      )
+    }
+
+    const payout =
+      weight * Number(price.buy_price)
 
     const { data, error } = await supabase
       .from('weigh_ins')
